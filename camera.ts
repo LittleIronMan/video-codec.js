@@ -25,7 +25,7 @@ class Camera implements IReader {
                 this._sec_per_frame = 1 / this._fps;
                 this._first_timestamp = this._prev_frame_index = -1;
                 this._video = document.createElement('video');
-                this._video.src = URL.createObjectURL(strm);
+                this._video.srcObject = strm;
                 this._video.play();
                 this._video.addEventListener('loadedmetadata', (e) => {
                     var w = this._width = this._video.videoWidth;
