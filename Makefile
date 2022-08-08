@@ -48,7 +48,7 @@ EMCC_OPTS=-O3 --llvm-lto 1 --memory-init-file 0 -s BUILD_AS_WORKER=1 -s TOTAL_ME
 # TARGETS=$(LIBDE265_LIB) $(THOR_DUMMY_TARGET) $(LIBVPX_LIB) $(OPENH264_LIB) $(OGG_LIB) $(DAALA_LIB) $(OPENH264_ENCODER) $(OPENH264_DECODER) $(DAALA_ENCODER) $(DAALA_DECODER) $(LIBVPX_ENCODER) $(LIBVPX_DECODER) $(LIBDE265_ENCODER) $(LIBDE265_DECODER) test.js
 TARGETS=$(OPENH264_DECODER)
 
-all: apply-patch emscripten-env $(TARGETS)
+all: apply-patch $(TARGETS)
 clean:
 	(cd $(LIBDE265_DIR); rm -rf *; git reset --hard); \
 	(cd $(THOR_DIR);  rm -rf *; git reset --hard); \
@@ -60,9 +60,6 @@ clean:
 
 apply-patch:
 	cd $(NATIVE_DIR); /bin/bash ./apply-patch.sh
-
-emscripten-env:
-	source "/home/osboxes/Desktop/emsdk/emsdk_env.sh"
 
 test.js: *.ts
 	tsc --out test.js test.ts
