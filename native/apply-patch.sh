@@ -6,7 +6,7 @@ function try_patch() {
         exit 0
     fi
 }
-(cd thor; try_patch ../thor.patch)
-(cd libvpx; try_patch ../libvpx.patch)
+# (cd thor; try_patch ../thor.patch)
+# (cd libvpx; try_patch ../libvpx.patch)
 (cd openh264; try_patch ../openh264.patch)
-(cd ogg; try_patch ../ogg.patch)
+# (cd ogg; try_patch ../ogg.patch)

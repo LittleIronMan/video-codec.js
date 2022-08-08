@@ -58,7 +58,7 @@ clean:
 	rm -f $(TARGETS)
 
 apply-patch:
-	cd $(NATIVE_DIR); ./apply-patch.sh
+	cd $(NATIVE_DIR); /bin/bash ./apply-patch.sh
 
 test.js: *.ts
 	tsc --out test.js test.ts
