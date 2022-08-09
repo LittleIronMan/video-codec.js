@@ -54,9 +54,9 @@ clean:
 	(cd $(THOR_DIR);  rm -rf *; git reset --hard); \
 	(cd $(LIBVPX_DIR);  rm -rf *; git reset --hard); \
 	(cd $(OPENH264_DIR);  rm -rf *; git reset --hard); \
-	(cd $(DAALA_DIR);  rm -rf *; git reset --hard); \
-	(cd $(OGG_DIR);  rm -rf *; git reset --hard); \
 	rm -f $(TARGETS)
+# (cd $(DAALA_DIR);  rm -rf *; git reset --hard); \
+# (cd $(OGG_DIR);  rm -rf *; git reset --hard); \
 
 apply-patch:
 	cd $(NATIVE_DIR); /bin/bash ./apply-patch.sh
