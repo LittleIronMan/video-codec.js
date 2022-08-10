@@ -1,0 +1,40 @@
+diff --git a/Makefile b/Makefile
+index dceec3bd..666ce463 100644
+--- a/Makefile
++++ b/Makefile
+@@ -55,7 +55,7 @@ endif
+ ifeq ($(BUILDTYPE), Release)
+ CFLAGS += $(CFLAGS_OPT)
+ CFLAGS += -DNDEBUG
+-USE_ASM = Yes
++USE_ASM = No
+ ifeq ($(DEBUGSYMBOLS), True)
+ CFLAGS += -g
+ CXXFLAGS += -g
+@@ -136,11 +136,11 @@ CONSOLE_COMMON_INCLUDES += \
+     -I$(SRC_PATH)codec/console/common/inc
+ 
+ H264DEC_INCLUDES += $(DECODER_INCLUDES) $(CONSOLE_COMMON_INCLUDES) -I$(SRC_PATH)codec/console/dec/inc
+-H264DEC_LDFLAGS = $(LINK_LOCAL_DIR) $(call LINK_LIB,decoder) $(call LINK_LIB,common) $(call LINK_LIB,console_common)
++H264DEC_LDFLAGS = $(LINK_LOCAL_DIR) $(call LINK_LIB,decoder) $(call LINK_LIB,common) $(call LINK_LIB,console_common) -Wl,-mwasm64
+ H264DEC_DEPS = $(LIBPREFIX)decoder.$(LIBSUFFIX) $(LIBPREFIX)common.$(LIBSUFFIX) $(LIBPREFIX)console_common.$(LIBSUFFIX)
+ 
+ H264ENC_INCLUDES += $(ENCODER_INCLUDES) $(CONSOLE_COMMON_INCLUDES) -I$(SRC_PATH)codec/console/enc/inc
+-H264ENC_LDFLAGS = $(LINK_LOCAL_DIR) $(call LINK_LIB,encoder) $(call LINK_LIB,processing) $(call LINK_LIB,common) $(call LINK_LIB,console_common)
++H264ENC_LDFLAGS = $(LINK_LOCAL_DIR) $(call LINK_LIB,encoder) $(call LINK_LIB,processing) $(call LINK_LIB,common) $(call LINK_LIB,console_common) -Wl,-mwasm64
+ H264ENC_DEPS = $(LIBPREFIX)encoder.$(LIBSUFFIX) $(LIBPREFIX)processing.$(LIBSUFFIX) $(LIBPREFIX)common.$(LIBSUFFIX) $(LIBPREFIX)console_common.$(LIBSUFFIX)
+ 
+ CODEC_UNITTEST_LDFLAGS = $(LINK_LOCAL_DIR) $(call LINK_LIB,gtest) $(call LINK_LIB,decoder) $(call LINK_LIB,encoder) $(call LINK_LIB,processing) $(call LINK_LIB,common) $(CODEC_UNITTEST_LDFLAGS_SUFFIX)
+diff --git a/build/platform-linux.mk b/build/platform-linux.mk
+index e46ae689..4a0932ff 100644
+--- a/build/platform-linux.mk
++++ b/build/platform-linux.mk
+@@ -2,7 +2,7 @@ include $(SRC_PATH)build/arch.mk
+ SHAREDLIBSUFFIX = so
+ SHAREDLIBSUFFIXFULLVER=$(SHAREDLIBSUFFIX).$(FULL_VERSION)
+ SHAREDLIBSUFFIXMAJORVER=$(SHAREDLIBSUFFIX).$(SHAREDLIB_MAJORVERSION)
+-SHLDFLAGS = -Wl,-soname,$(LIBPREFIX)$(PROJECT_NAME).$(SHAREDLIBSUFFIXMAJORVER)
++SHLDFLAGS = -Wl,-soname,$(LIBPREFIX)$(PROJECT_NAME).$(SHAREDLIBSUFFIXMAJORVER) -Wl,-mwasm64
+ CFLAGS += -Wall -fno-strict-aliasing -fPIC -MMD -MP
+ ifeq ($(USE_STACK_PROTECTOR), Yes)
+ CFLAGS += -fstack-protector-all
