@@ -1,5 +1,5 @@
 diff --git a/Makefile b/Makefile
-index dceec3bd..07606219 100644
+index dceec3bd..b93377e2 100644
 --- a/Makefile
 +++ b/Makefile
 @@ -55,7 +55,7 @@ endif
@@ -29,13 +29,13 @@ index dceec3bd..07606219 100644
  .PHONY: test gtest-bootstrap clean $(PROJECT_NAME).pc $(PROJECT_NAME)-static.pc
  
  generate-version:
-+	@echo "--- [Makefile] generate-version"
++	@echo "--- [Makefile] $@"
  	$(QUIET)sh $(SRC_PATH)codec/common/generate_version.sh $(SRC_PATH)
  
  codec/decoder/plus/src/welsDecoderExt.$(OBJ): | generate-version
-+	@echo "--- [Makefile] codec/decoder/plus/src/welsDecoderExt.$(OBJ)"
++#	@echo "--- [Makefile] $@"
  codec/encoder/plus/src/welsEncoderExt.$(OBJ): | generate-version
-+	@echo "--- [Makefile] codec/encoder/plus/src/welsEncoderExt.$(OBJ):"
++#	@echo "--- [Makefile] $@"
  
  clean:
  ifeq (android,$(OS))
@@ -43,12 +43,12 @@ index dceec3bd..07606219 100644
  	$(QUIET)rm -f $(OBJS) $(OBJS:.$(OBJ)=.d) $(OBJS:.$(OBJ)=.obj) $(LIBRARIES) $(BINARIES) *.lib *.a *.dylib *.dll *.so *.so.* *.exe *.pdb *.exp *.pc *.res *.map $(SRC_PATH)codec/common/inc/version_gen.h
  
  gmp-bootstrap:
-+	@echo "--- [Makefile] gmp-bootstrap"
++	@echo "--- [Makefile] $@"
  	if [ ! -d gmp-api ] ; then git clone https://github.com/mozilla/gmp-api gmp-api ; fi
  	cd gmp-api && git fetch origin && git checkout $(GMP_API_BRANCH)
  
  gtest-bootstrap:
-+	@echo "--- [Makefile] gtest-bootstrap"
++	@echo "--- [Makefile] $@"
  	if [ ! -d gtest ] ; then git clone https://github.com/google/googletest.git gtest && \
         cd gtest && git checkout -b $(GTEST_VER) $(GTEST_VER) ; fi
  
@@ -56,18 +56,18 @@ index dceec3bd..07606219 100644
  endif
  
  libraries: $(LIBPREFIX)$(PROJECT_NAME).$(LIBSUFFIX)
-+	@echo "--- [Makefile] libraries"
++	@echo "--- [Makefile] $@"
  
  # No point in building dylib for ios
  ifneq (ios, $(OS))
  libraries: $(LIBPREFIX)$(PROJECT_NAME).$(SHAREDLIBSUFFIX)
-+	@echo "--- [Makefile] libraries"
++	@echo "--- [Makefile] $@"
  endif
  
  LIBRARIES += $(LIBPREFIX)$(PROJECT_NAME).$(LIBSUFFIX) $(LIBPREFIX)$(PROJECT_NAME).$(SHAREDLIBSUFFIXFULLVER)
  
  $(LIBPREFIX)$(PROJECT_NAME).$(LIBSUFFIX): $(ENCODER_OBJS) $(DECODER_OBJS) $(PROCESSING_OBJS) $(COMMON_OBJS)
-+	@echo "--- [Makefile] libopen264.a"
++	@echo "--- [Makefile] $@"
  	$(QUIET)rm -f $@
  	$(QUIET_AR)$(AR) $(AR_OPTS) $+
  ifeq (True, $(PROCESS_FILES))
@@ -75,102 +75,110 @@ index dceec3bd..07606219 100644
  endif
  
  $(LIBPREFIX)$(PROJECT_NAME).$(SHAREDLIBSUFFIXFULLVER): $(ENCODER_OBJS) $(DECODER_OBJS) $(PROCESSING_OBJS) $(COMMON_OBJS)
-+	@echo "--- [Makefile] libopen264.so.2.3.0"
++	@echo "--- [Makefile] $@"
  	$(QUIET)rm -f $@
  	$(QUIET_CXX)$(CXX) $(SHARED) $(CXX_LINK_O) $+ $(LDFLAGS) $(SHLDFLAGS)
  ifeq (True, $(PROCESS_FILES))
-@@ -257,9 +266,11 @@ endif
+@@ -247,6 +256,7 @@ endif
+ 
+ ifneq ($(SHAREDLIBSUFFIXFULLVER),$(SHAREDLIBSUFFIX))
+ $(LIBPREFIX)$(PROJECT_NAME).$(SHAREDLIBSUFFIX): $(LIBPREFIX)$(PROJECT_NAME).$(SHAREDLIBSUFFIXFULLVER)
++	@echo "--- [Makefile] $@"
+ 	$(QUIET)ln -sfn $+ $(LIBPREFIX)$(PROJECT_NAME).$(SHAREDLIBSUFFIXMAJORVER)
+ 	$(QUIET)ln -sfn $(LIBPREFIX)$(PROJECT_NAME).$(SHAREDLIBSUFFIXMAJORVER) $@
+ ifeq (True, $(PROCESS_FILES))
+@@ -257,9 +267,11 @@ endif
  
  ifeq ($(HAVE_GMP_API),Yes)
  plugin: $(MODULE)
-+	@echo "--- [Makefile] plugin"
++	@echo "--- [Makefile] $@"
  LIBRARIES += $(LIBPREFIX)$(MODULE_NAME).$(SHAREDLIBSUFFIXFULLVER)
  else
  plugin:
-+	@echo "--- [Makefile] plugin"
++	@echo "--- [Makefile] $@"
  	@echo "./gmp-api: No such file or directory."
  	@echo "You do not have gmp-api.  Run make gmp-bootstrap to get the gmp-api headers."
  endif
-@@ -268,6 +279,7 @@ echo-plugin-name:
+@@ -268,6 +280,7 @@ echo-plugin-name:
  	@echo $(MODULE)
  
  $(LIBPREFIX)$(MODULE_NAME).$(SHAREDLIBSUFFIXFULLVER): $(MODULE_OBJS) $(ENCODER_OBJS) $(DECODER_OBJS) $(PROCESSING_OBJS) $(COMMON_OBJS)
-+	@echo "--- [Makefile] libgmpopenh264.so.2.3.0"
++	@echo "--- [Makefile] $@"
  	$(QUIET)rm -f $@
  	$(QUIET_CXX)$(CXX) $(SHARED) $(CXX_LINK_O) $+ $(LDFLAGS) $(SHLDFLAGS) $(MODULE_LDFLAGS)
  ifeq (True, $(PROCESS_FILES))
-@@ -286,24 +298,30 @@ endif
+@@ -286,24 +299,30 @@ endif
  endif
  
  $(PROJECT_NAME).pc: $(PROJECT_NAME).pc.in
-+	@echo "--- [Makefile] openh264.pc"
++	@echo "--- [Makefile] $@"
  	@sed -e 's;@prefix@;$(PREFIX);' -e 's;@libdir@;$(PREFIX)/lib;' -e 's;@VERSION@;$(FULL_VERSION);' -e 's;@LIBS@;;' -e 's;@LIBS_PRIVATE@;$(STATIC_LDFLAGS);' < $< > $@
  
  $(PROJECT_NAME)-static.pc: $(PROJECT_NAME).pc.in
-+	@echo "--- [Makefile] openh264-static.pc"
++	@echo "--- [Makefile] $@"
  	@sed -e 's;@prefix@;$(PREFIX);' -e 's;@libdir@;$(PREFIX)/lib;' -e 's;@VERSION@;$(FULL_VERSION);' -e 's;@LIBS@;$(STATIC_LDFLAGS);' -e 's;@LIBS_PRIVATE@;;' < $< > $@
  
  install-headers:
-+	@echo "--- [Makefile] install-headers"
++	@echo "--- [Makefile] $@"
  	mkdir -p $(DESTDIR)$(PREFIX)/include/wels
  	install -m 644 $(SRC_PATH)/codec/api/wels/codec*.h $(DESTDIR)$(PREFIX)/include/wels
  
  install-static-lib: $(LIBPREFIX)$(PROJECT_NAME).$(LIBSUFFIX) install-headers
-+	@echo "--- [Makefile] install-static-lib"
++	@echo "--- [Makefile] $@"
  	mkdir -p $(DESTDIR)$(PREFIX)/$(LIBDIR_NAME)
  	install -m 644 $(LIBPREFIX)$(PROJECT_NAME).$(LIBSUFFIX) $(DESTDIR)$(PREFIX)/$(LIBDIR_NAME)
  
  install-static: install-static-lib $(PROJECT_NAME)-static.pc
-+	@echo "--- [Makefile] install-static"
++	@echo "--- [Makefile] $@"
  	mkdir -p $(DESTDIR)$(PREFIX)/$(LIBDIR_NAME)/pkgconfig
  	install -m 644 $(PROJECT_NAME)-static.pc $(DESTDIR)$(PREFIX)/$(LIBDIR_NAME)/pkgconfig/$(PROJECT_NAME).pc
  
  install-shared: $(LIBPREFIX)$(PROJECT_NAME).$(SHAREDLIBSUFFIX) install-headers $(PROJECT_NAME).pc
-+	@echo "--- [Makefile] install-shared"
++	@echo "--- [Makefile] $@"
  	mkdir -p $(DESTDIR)$(SHAREDLIB_DIR)
  	install -m 755 $(LIBPREFIX)$(PROJECT_NAME).$(SHAREDLIBSUFFIXFULLVER) $(DESTDIR)$(SHAREDLIB_DIR)
  	if [ "$(SHAREDLIBSUFFIXFULLVER)" != "$(SHAREDLIBSUFFIX)" ]; then \
-@@ -317,10 +335,12 @@ ifneq ($(EXTRA_LIBRARY),)
+@@ -317,10 +336,12 @@ ifneq ($(EXTRA_LIBRARY),)
  endif
  
  install: install-static-lib install-shared
-+	@echo "--- [Makefile] install"
++	@echo "--- [Makefile] $@"
  	@:
  
  ifneq ($(HAVE_GTEST),Yes)
  binaries:
-+	@echo "--- [Makefile] binaries"
++	@echo "--- [Makefile] $@"
  	@:
  else
  include $(SRC_PATH)build/gtest-targets.mk
-@@ -342,15 +362,18 @@ $(LIBPREFIX)ut.$(SHAREDLIBSUFFIX): $(DECODER_UNITTEST_OBJS) $(ENCODER_UNITTEST_O
+@@ -342,15 +363,18 @@ $(LIBPREFIX)ut.$(SHAREDLIBSUFFIX): $(DECODER_UNITTEST_OBJS) $(ENCODER_UNITTEST_O
  	$(QUIET_CXX)$(CXX) $(SHARED) $(CXX_LINK_O) $+ $(LDFLAGS) $(UTSHLDFLAGS) $(CODEC_UNITTEST_LDFLAGS)
  
  binaries: codec_unittest$(EXEEXT)
-+	@echo "--- [Makefile] binaries"
++	@echo "--- [Makefile] $@"
  BINARIES += codec_unittest$(EXEEXT)
  
  ifeq ($(BUILD_UT_EXE), Yes)
  # Build a normal command line executable
  codec_unittest$(EXEEXT): $(DECODER_UNITTEST_OBJS) $(ENCODER_UNITTEST_OBJS) $(PROCESSING_UNITTEST_OBJS) $(API_TEST_OBJS) $(COMMON_UNITTEST_OBJS) $(CODEC_UNITTEST_DEPS) | res
-+	@echo "--- [Makefile] codec_unittest"
++	@echo "--- [Makefile] $@"
  	$(QUIET)rm -f $@
  	$(QUIET_CXX)$(CXX) $(CXX_LINK_O) $+ $(CODEC_UNITTEST_LDFLAGS) $(LDFLAGS)
  
  res:
-+	@echo "--- [Makefile] res"
++	@echo "--- [Makefile] $@"
  	$(QUIET)if [ ! -e res ]; then ln -s $(SRC_PATH)res .; fi
  else
  
-@@ -380,6 +403,8 @@ endif
+@@ -380,6 +404,8 @@ endif
  OBJDIRS = $(sort $(dir $(OBJS)))
  
  $(OBJDIRS):
-+	@echo "--- [Makefile] $(OBJDIRS)"
++	@echo "--- [Makefile] $@"
  	$(QUIET)mkdir -p $@
  
  $(OBJS): | $(OBJDIRS)
-+	@echo "--- [Makefile] $(OBJS)"
++#	@echo "--- [Makefile] $@"
 diff --git a/build/platform-linux.mk b/build/platform-linux.mk
 index e46ae689..4a0932ff 100644
 --- a/build/platform-linux.mk
