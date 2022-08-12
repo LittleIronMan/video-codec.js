@@ -1,0 +1,186 @@
+diff --git a/Makefile b/Makefile
+index dceec3bd..07606219 100644
+--- a/Makefile
++++ b/Makefile
+@@ -55,7 +55,7 @@ endif
+ ifeq ($(BUILDTYPE), Release)
+ CFLAGS += $(CFLAGS_OPT)
+ CFLAGS += -DNDEBUG
+-USE_ASM = Yes
++USE_ASM = No
+ ifeq ($(DEBUGSYMBOLS), True)
+ CFLAGS += -g
+ CXXFLAGS += -g
+@@ -136,11 +136,11 @@ CONSOLE_COMMON_INCLUDES += \
+     -I$(SRC_PATH)codec/console/common/inc
+ 
+ H264DEC_INCLUDES += $(DECODER_INCLUDES) $(CONSOLE_COMMON_INCLUDES) -I$(SRC_PATH)codec/console/dec/inc
+-H264DEC_LDFLAGS = $(LINK_LOCAL_DIR) $(call LINK_LIB,decoder) $(call LINK_LIB,common) $(call LINK_LIB,console_common)
++H264DEC_LDFLAGS = $(LINK_LOCAL_DIR) $(call LINK_LIB,decoder) $(call LINK_LIB,common) $(call LINK_LIB,console_common) -Wl,-mwasm64
+ H264DEC_DEPS = $(LIBPREFIX)decoder.$(LIBSUFFIX) $(LIBPREFIX)common.$(LIBSUFFIX) $(LIBPREFIX)console_common.$(LIBSUFFIX)
+ 
+ H264ENC_INCLUDES += $(ENCODER_INCLUDES) $(CONSOLE_COMMON_INCLUDES) -I$(SRC_PATH)codec/console/enc/inc
+-H264ENC_LDFLAGS = $(LINK_LOCAL_DIR) $(call LINK_LIB,encoder) $(call LINK_LIB,processing) $(call LINK_LIB,common) $(call LINK_LIB,console_common)
++H264ENC_LDFLAGS = $(LINK_LOCAL_DIR) $(call LINK_LIB,encoder) $(call LINK_LIB,processing) $(call LINK_LIB,common) $(call LINK_LIB,console_common) -Wl,-mwasm64
+ H264ENC_DEPS = $(LIBPREFIX)encoder.$(LIBSUFFIX) $(LIBPREFIX)processing.$(LIBSUFFIX) $(LIBPREFIX)common.$(LIBSUFFIX) $(LIBPREFIX)console_common.$(LIBSUFFIX)
+ 
+ CODEC_UNITTEST_LDFLAGS = $(LINK_LOCAL_DIR) $(call LINK_LIB,gtest) $(call LINK_LIB,decoder) $(call LINK_LIB,encoder) $(call LINK_LIB,processing) $(call LINK_LIB,common) $(CODEC_UNITTEST_LDFLAGS_SUFFIX)
+@@ -161,10 +161,13 @@ COMMON_UNITTEST_CFLAGS += $(CODEC_UNITTEST_CFLAGS)
+ .PHONY: test gtest-bootstrap clean $(PROJECT_NAME).pc $(PROJECT_NAME)-static.pc
+ 
+ generate-version:
++	@echo "--- [Makefile] generate-version"
+ 	$(QUIET)sh $(SRC_PATH)codec/common/generate_version.sh $(SRC_PATH)
+ 
+ codec/decoder/plus/src/welsDecoderExt.$(OBJ): | generate-version
++	@echo "--- [Makefile] codec/decoder/plus/src/welsDecoderExt.$(OBJ)"
+ codec/encoder/plus/src/welsEncoderExt.$(OBJ): | generate-version
++	@echo "--- [Makefile] codec/encoder/plus/src/welsEncoderExt.$(OBJ):"
+ 
+ clean:
+ ifeq (android,$(OS))
+@@ -173,10 +176,12 @@ endif
+ 	$(QUIET)rm -f $(OBJS) $(OBJS:.$(OBJ)=.d) $(OBJS:.$(OBJ)=.obj) $(LIBRARIES) $(BINARIES) *.lib *.a *.dylib *.dll *.so *.so.* *.exe *.pdb *.exp *.pc *.res *.map $(SRC_PATH)codec/common/inc/version_gen.h
+ 
+ gmp-bootstrap:
++	@echo "--- [Makefile] gmp-bootstrap"
+ 	if [ ! -d gmp-api ] ; then git clone https://github.com/mozilla/gmp-api gmp-api ; fi
+ 	cd gmp-api && git fetch origin && git checkout $(GMP_API_BRANCH)
+ 
+ gtest-bootstrap:
++	@echo "--- [Makefile] gtest-bootstrap"
+ 	if [ ! -d gtest ] ; then git clone https://github.com/google/googletest.git gtest && \
+        cd gtest && git checkout -b $(GTEST_VER) $(GTEST_VER) ; fi
+ 
+@@ -221,15 +226,18 @@ endif
+ endif
+ 
+ libraries: $(LIBPREFIX)$(PROJECT_NAME).$(LIBSUFFIX)
++	@echo "--- [Makefile] libraries"
+ 
+ # No point in building dylib for ios
+ ifneq (ios, $(OS))
+ libraries: $(LIBPREFIX)$(PROJECT_NAME).$(SHAREDLIBSUFFIX)
++	@echo "--- [Makefile] libraries"
+ endif
+ 
+ LIBRARIES += $(LIBPREFIX)$(PROJECT_NAME).$(LIBSUFFIX) $(LIBPREFIX)$(PROJECT_NAME).$(SHAREDLIBSUFFIXFULLVER)
+ 
+ $(LIBPREFIX)$(PROJECT_NAME).$(LIBSUFFIX): $(ENCODER_OBJS) $(DECODER_OBJS) $(PROCESSING_OBJS) $(COMMON_OBJS)
++	@echo "--- [Makefile] libopen264.a"
+ 	$(QUIET)rm -f $@
+ 	$(QUIET_AR)$(AR) $(AR_OPTS) $+
+ ifeq (True, $(PROCESS_FILES))
+@@ -238,6 +246,7 @@ ifeq (True, $(PROCESS_FILES))
+ endif
+ 
+ $(LIBPREFIX)$(PROJECT_NAME).$(SHAREDLIBSUFFIXFULLVER): $(ENCODER_OBJS) $(DECODER_OBJS) $(PROCESSING_OBJS) $(COMMON_OBJS)
++	@echo "--- [Makefile] libopen264.so.2.3.0"
+ 	$(QUIET)rm -f $@
+ 	$(QUIET_CXX)$(CXX) $(SHARED) $(CXX_LINK_O) $+ $(LDFLAGS) $(SHLDFLAGS)
+ ifeq (True, $(PROCESS_FILES))
+@@ -257,9 +266,11 @@ endif
+ 
+ ifeq ($(HAVE_GMP_API),Yes)
+ plugin: $(MODULE)
++	@echo "--- [Makefile] plugin"
+ LIBRARIES += $(LIBPREFIX)$(MODULE_NAME).$(SHAREDLIBSUFFIXFULLVER)
+ else
+ plugin:
++	@echo "--- [Makefile] plugin"
+ 	@echo "./gmp-api: No such file or directory."
+ 	@echo "You do not have gmp-api.  Run make gmp-bootstrap to get the gmp-api headers."
+ endif
+@@ -268,6 +279,7 @@ echo-plugin-name:
+ 	@echo $(MODULE)
+ 
+ $(LIBPREFIX)$(MODULE_NAME).$(SHAREDLIBSUFFIXFULLVER): $(MODULE_OBJS) $(ENCODER_OBJS) $(DECODER_OBJS) $(PROCESSING_OBJS) $(COMMON_OBJS)
++	@echo "--- [Makefile] libgmpopenh264.so.2.3.0"
+ 	$(QUIET)rm -f $@
+ 	$(QUIET_CXX)$(CXX) $(SHARED) $(CXX_LINK_O) $+ $(LDFLAGS) $(SHLDFLAGS) $(MODULE_LDFLAGS)
+ ifeq (True, $(PROCESS_FILES))
+@@ -286,24 +298,30 @@ endif
+ endif
+ 
+ $(PROJECT_NAME).pc: $(PROJECT_NAME).pc.in
++	@echo "--- [Makefile] openh264.pc"
+ 	@sed -e 's;@prefix@;$(PREFIX);' -e 's;@libdir@;$(PREFIX)/lib;' -e 's;@VERSION@;$(FULL_VERSION);' -e 's;@LIBS@;;' -e 's;@LIBS_PRIVATE@;$(STATIC_LDFLAGS);' < $< > $@
+ 
+ $(PROJECT_NAME)-static.pc: $(PROJECT_NAME).pc.in
++	@echo "--- [Makefile] openh264-static.pc"
+ 	@sed -e 's;@prefix@;$(PREFIX);' -e 's;@libdir@;$(PREFIX)/lib;' -e 's;@VERSION@;$(FULL_VERSION);' -e 's;@LIBS@;$(STATIC_LDFLAGS);' -e 's;@LIBS_PRIVATE@;;' < $< > $@
+ 
+ install-headers:
++	@echo "--- [Makefile] install-headers"
+ 	mkdir -p $(DESTDIR)$(PREFIX)/include/wels
+ 	install -m 644 $(SRC_PATH)/codec/api/wels/codec*.h $(DESTDIR)$(PREFIX)/include/wels
+ 
+ install-static-lib: $(LIBPREFIX)$(PROJECT_NAME).$(LIBSUFFIX) install-headers
++	@echo "--- [Makefile] install-static-lib"
+ 	mkdir -p $(DESTDIR)$(PREFIX)/$(LIBDIR_NAME)
+ 	install -m 644 $(LIBPREFIX)$(PROJECT_NAME).$(LIBSUFFIX) $(DESTDIR)$(PREFIX)/$(LIBDIR_NAME)
+ 
+ install-static: install-static-lib $(PROJECT_NAME)-static.pc
++	@echo "--- [Makefile] install-static"
+ 	mkdir -p $(DESTDIR)$(PREFIX)/$(LIBDIR_NAME)/pkgconfig
+ 	install -m 644 $(PROJECT_NAME)-static.pc $(DESTDIR)$(PREFIX)/$(LIBDIR_NAME)/pkgconfig/$(PROJECT_NAME).pc
+ 
+ install-shared: $(LIBPREFIX)$(PROJECT_NAME).$(SHAREDLIBSUFFIX) install-headers $(PROJECT_NAME).pc
++	@echo "--- [Makefile] install-shared"
+ 	mkdir -p $(DESTDIR)$(SHAREDLIB_DIR)
+ 	install -m 755 $(LIBPREFIX)$(PROJECT_NAME).$(SHAREDLIBSUFFIXFULLVER) $(DESTDIR)$(SHAREDLIB_DIR)
+ 	if [ "$(SHAREDLIBSUFFIXFULLVER)" != "$(SHAREDLIBSUFFIX)" ]; then \
+@@ -317,10 +335,12 @@ ifneq ($(EXTRA_LIBRARY),)
+ endif
+ 
+ install: install-static-lib install-shared
++	@echo "--- [Makefile] install"
+ 	@:
+ 
+ ifneq ($(HAVE_GTEST),Yes)
+ binaries:
++	@echo "--- [Makefile] binaries"
+ 	@:
+ else
+ include $(SRC_PATH)build/gtest-targets.mk
+@@ -342,15 +362,18 @@ $(LIBPREFIX)ut.$(SHAREDLIBSUFFIX): $(DECODER_UNITTEST_OBJS) $(ENCODER_UNITTEST_O
+ 	$(QUIET_CXX)$(CXX) $(SHARED) $(CXX_LINK_O) $+ $(LDFLAGS) $(UTSHLDFLAGS) $(CODEC_UNITTEST_LDFLAGS)
+ 
+ binaries: codec_unittest$(EXEEXT)
++	@echo "--- [Makefile] binaries"
+ BINARIES += codec_unittest$(EXEEXT)
+ 
+ ifeq ($(BUILD_UT_EXE), Yes)
+ # Build a normal command line executable
+ codec_unittest$(EXEEXT): $(DECODER_UNITTEST_OBJS) $(ENCODER_UNITTEST_OBJS) $(PROCESSING_UNITTEST_OBJS) $(API_TEST_OBJS) $(COMMON_UNITTEST_OBJS) $(CODEC_UNITTEST_DEPS) | res
++	@echo "--- [Makefile] codec_unittest"
+ 	$(QUIET)rm -f $@
+ 	$(QUIET_CXX)$(CXX) $(CXX_LINK_O) $+ $(CODEC_UNITTEST_LDFLAGS) $(LDFLAGS)
+ 
+ res:
++	@echo "--- [Makefile] res"
+ 	$(QUIET)if [ ! -e res ]; then ln -s $(SRC_PATH)res .; fi
+ else
+ 
+@@ -380,6 +403,8 @@ endif
+ OBJDIRS = $(sort $(dir $(OBJS)))
+ 
+ $(OBJDIRS):
++	@echo "--- [Makefile] $(OBJDIRS)"
+ 	$(QUIET)mkdir -p $@
+ 
+ $(OBJS): | $(OBJDIRS)
++	@echo "--- [Makefile] $(OBJS)"
+diff --git a/build/platform-linux.mk b/build/platform-linux.mk
+index e46ae689..4a0932ff 100644
+--- a/build/platform-linux.mk
++++ b/build/platform-linux.mk
+@@ -2,7 +2,7 @@ include $(SRC_PATH)build/arch.mk
+ SHAREDLIBSUFFIX = so
+ SHAREDLIBSUFFIXFULLVER=$(SHAREDLIBSUFFIX).$(FULL_VERSION)
+ SHAREDLIBSUFFIXMAJORVER=$(SHAREDLIBSUFFIX).$(SHAREDLIB_MAJORVERSION)
+-SHLDFLAGS = -Wl,-soname,$(LIBPREFIX)$(PROJECT_NAME).$(SHAREDLIBSUFFIXMAJORVER)
++SHLDFLAGS = -Wl,-soname,$(LIBPREFIX)$(PROJECT_NAME).$(SHAREDLIBSUFFIXMAJORVER) -Wl,-mwasm64
+ CFLAGS += -Wall -fno-strict-aliasing -fPIC -MMD -MP
+ ifeq ($(USE_STACK_PROTECTOR), Yes)
+ CFLAGS += -fstack-protector-all
