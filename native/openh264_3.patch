@@ -1,14 +1,21 @@
 diff --git a/Makefile b/Makefile
-index dceec3bd..695081c9 100644
+index dceec3bd..3e911002 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -54,8 +54,8 @@ endif
- # Configurations
+@@ -34,7 +34,7 @@ GTEST_VER=release-1.8.1
+ CCASFLAGS=$(CFLAGS)
+ STATIC_LDFLAGS=-lstdc++
+ STRIP ?= strip
+-USE_STACK_PROTECTOR = Yes
++USE_STACK_PROTECTOR = No
+ 
+ SHAREDLIB_MAJORVERSION=6
+ FULL_VERSION := 2.3.0
+@@ -55,7 +55,7 @@ endif
  ifeq ($(BUILDTYPE), Release)
  CFLAGS += $(CFLAGS_OPT)
--CFLAGS += -DNDEBUG
+ CFLAGS += -DNDEBUG
 -USE_ASM = Yes
-+CFLAGS += -DNDEBUG -fno-stack-protector
 +USE_ASM = No
  ifeq ($(DEBUGSYMBOLS), True)
  CFLAGS += -g
