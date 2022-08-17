@@ -43,7 +43,8 @@ DAALA_ENCODER_EXPORTS='_daala_encode_create','_daala_encode_ctl','_daala_encode_
 DAALA_DECODER_EXPORTS='_daala_decode_header_in','_daala_decode_create','_daala_decode_packet_in','_daala_decode_img_out','_daala_setup_free','_daala_info_create','_daala_info_init','_daala_comment_create','_od_img_create','_oggbyte_readcopy','_od_state_init','_od_accounting_init','_od_ec_dec_init','_od_codedquantizer_to_quantizer','_generic_decode_','_od_hv_intra_pred','_od_raster_to_coding_order','_od_qm_get_index','_od_pvq_decode','_od_postfilter_split'
 
 EMCC_OPTS=-O3 --llvm-lto 1 --memory-init-file 0 -s BUILD_AS_WORKER=1 -s TOTAL_MEMORY=67108864 \
-          -s NO_FILESYSTEM=1 -s NO_BROWSER=1 -s EXPORTED_FUNCTIONS="['_malloc']" -s EXPORTED_RUNTIME_METHODS="['setValue', 'getValue']"
+          -s NO_FILESYSTEM=1 -s EXPORTED_FUNCTIONS="['_malloc']" -s EXPORTED_RUNTIME_METHODS="['setValue', 'getValue']" \
+					-sMEMORY64=1 -m64 -Wl,-mwasm64
 
 # TARGETS=$(LIBDE265_LIB) $(THOR_DUMMY_TARGET) $(LIBVPX_LIB) $(OPENH264_LIB) $(OGG_LIB) $(DAALA_LIB) $(OPENH264_ENCODER) $(OPENH264_DECODER) $(DAALA_ENCODER) $(DAALA_DECODER) $(LIBVPX_ENCODER) $(LIBVPX_DECODER) $(LIBDE265_ENCODER) $(LIBDE265_DECODER) test.js
 # TARGETS=$(OPENH264_LIB) $(OPENH264_ENCODER) $(OPENH264_DECODER)
@@ -110,7 +111,7 @@ $(OPENH264_ENCODER): $(OPENH264_ENCODER_DEPS)
 	emcc -o $@ $(EMCC_OPTS) -s EXPORTED_FUNCTIONS="[$(OPENH264_ENCODER_EXPORTS)]" --post-js .openh264_encoder.js $(OPENH264_LIB) $(NATIVE_DIR)/openh264_binding.c
 
 $(OPENH264_DECODER): $(OPENH264_DECODER_DEPS)
-	tsc --out .openh264_decoder.js openh264_decoder.ts && \
+	tsc --lib DOM,WebWorker,ES6 --skipLibCheck --out .openh264_decoder.js openh264_decoder.ts && \
 	emcc -o $@ $(EMCC_OPTS) -s EXPORTED_FUNCTIONS="[$(OPENH264_DECODER_EXPORTS)]" --post-js .openh264_decoder.js $(OPENH264_LIB) $(NATIVE_DIR)/openh264_binding.c
 
 $(DAALA_ENCODER): $(DAALA_ENCODER_DEPS) daala_encoder.ts

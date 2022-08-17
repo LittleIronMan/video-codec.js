@@ -8,7 +8,6 @@ declare function _WelsDecoderDecodeFrame(ptr: number, src: number, srcLen: numbe
 declare function _SizeOfSBufferInfo(): number;
 
 class OpenH264Decoder {
-    worker: Worker;
     decoder: number;
     
     buf: Uint8Array;
@@ -19,7 +18,7 @@ class OpenH264Decoder {
 
     MAX_NALU_SIZE = 1024 * 1024;
 
-    constructor(worker: Worker) {
+    constructor(private worker: typeof self) {
         this.worker = worker;
 
         var handle = Module._malloc(4);
@@ -121,4 +120,4 @@ class OpenH264Decoder {
         };
     }
 }
-new OpenH264Decoder(this);
+new OpenH264Decoder(self);

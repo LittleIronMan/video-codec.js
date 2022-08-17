@@ -22,7 +22,7 @@ interface VideoFrame {
     transferable: boolean;
 }
 
-enum FrameType {
+enum H264FrameType {
     Key = 1,
     IDR = 1,
     I = 2,

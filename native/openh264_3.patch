@@ -1,12 +1,14 @@
 diff --git a/Makefile b/Makefile
-index dceec3bd..b93377e2 100644
+index dceec3bd..695081c9 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -55,7 +55,7 @@ endif
+@@ -54,8 +54,8 @@ endif
+ # Configurations
  ifeq ($(BUILDTYPE), Release)
  CFLAGS += $(CFLAGS_OPT)
- CFLAGS += -DNDEBUG
+-CFLAGS += -DNDEBUG
 -USE_ASM = Yes
++CFLAGS += -DNDEBUG -fno-stack-protector
 +USE_ASM = No
  ifeq ($(DEBUGSYMBOLS), True)
  CFLAGS += -g
@@ -192,3 +194,14 @@ index e46ae689..4a0932ff 100644
  CFLAGS += -Wall -fno-strict-aliasing -fPIC -MMD -MP
  ifeq ($(USE_STACK_PROTECTOR), Yes)
  CFLAGS += -fstack-protector-all
+diff --git a/build/x86-common.mk b/build/x86-common.mk
+index c2cf96b7..728b817d 100644
+--- a/build/x86-common.mk
++++ b/build/x86-common.mk
+@@ -1,5 +1,5 @@
+ CFLAGS_M32=-m32
+-CFLAGS_M64=-m64
++CFLAGS_M64=-m64 -sMEMORY64
+ ASM_INCLUDES = -I$(SRC_PATH)codec/common/x86/
+ ifneq ($(ENABLE64BIT),)
+ ifeq ($(ENABLE64BIT), Yes)

@@ -1,5 +1,5 @@
 #include <stdlib.h>
-#include "openh264/codec/api/svc/codec_api.h"
+#include "openh264/codec/api/wels/codec_api.h"
 
 SEncParamExt *CreateEncParamExt(ISVCEncoder *encoder, int width, int height, float maxFrameRate)
 {
@@ -66,7 +66,7 @@ int WelsSVCEncoderForceIntraFrame(ISVCEncoder *encoder)
 int WelsInitializeDecoder(ISVCDecoder *decoder)
 {
     SDecodingParam sDecParam = {0};
-    sDecParam.eOutputColorFormat = videoFormatI420;
+    // sDecParam.eOutputColorFormat = videoFormatI420;
     sDecParam.sVideoProperty.eVideoBsType = VIDEO_BITSTREAM_AVC;
     return (*decoder)->Initialize(decoder, &sDecParam);
 }
