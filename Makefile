@@ -42,7 +42,7 @@ DAALA_DECODER_DEPS=$(DAALA_LIB) $(NATIVE_DIR)/daala_binding.c
 DAALA_ENCODER_EXPORTS='_daala_encode_create','_daala_encode_ctl','_daala_encode_flush_header','_daala_encode_img_in','_daala_encode_packet_out','_daala_info_create','_daala_info_init','_daala_comment_create','_od_state_init','_od_img_create','_od_quantizer_to_codedquantizer','_od_apply_prefilter_frame_sbs','_od_apply_qm','_od_ec_tell_frac','_od_hv_intra_pred','_od_raster_to_coding_order','_od_log_matrix_uchar','_EXP_CDF_TABLE'
 DAALA_DECODER_EXPORTS='_daala_decode_header_in','_daala_decode_create','_daala_decode_packet_in','_daala_decode_img_out','_daala_setup_free','_daala_info_create','_daala_info_init','_daala_comment_create','_od_img_create','_oggbyte_readcopy','_od_state_init','_od_accounting_init','_od_ec_dec_init','_od_codedquantizer_to_quantizer','_generic_decode_','_od_hv_intra_pred','_od_raster_to_coding_order','_od_qm_get_index','_od_pvq_decode','_od_postfilter_split'
 
-EMCC_OPTS=-O3 --llvm-lto 1 --memory-init-file 0 -s BUILD_AS_WORKER=1 -s TOTAL_MEMORY=67108864 \
+EMCC_OPTS=-O3 --llvm-lto 1 --memory-init-file 0 -s -s TOTAL_MEMORY=67108864 \
           -s NO_FILESYSTEM=1 -s EXPORTED_FUNCTIONS="['_malloc']" -s EXPORTED_RUNTIME_METHODS="['setValue', 'getValue']"
 # -sMEMORY64=1 -m64 -Wl,-mwasm64
 
@@ -112,7 +112,7 @@ $(OPENH264_ENCODER): $(OPENH264_ENCODER_DEPS)
 
 $(OPENH264_DECODER): $(OPENH264_DECODER_DEPS)
 	tsc --lib DOM,WebWorker,ES6 --skipLibCheck --out .openh264_decoder.js openh264_decoder.ts && \
-	emcc -o $@ $(EMCC_OPTS) -s EXPORTED_FUNCTIONS="[$(OPENH264_DECODER_EXPORTS)]" --post-js .openh264_decoder.js $(OPENH264_LIB) $(NATIVE_DIR)/openh264_binding.c
+	emcc -o $@ $(EMCC_OPTS) -s EXPORTED_FUNCTIONS="[$(OPENH264_DECODER_EXPORTS)]" -pthread --post-js .openh264_decoder.js $(OPENH264_LIB) $(NATIVE_DIR)/openh264_binding.c
 
 $(DAALA_ENCODER): $(DAALA_ENCODER_DEPS) daala_encoder.ts
 	tsc --out .daala_encoder.js daala_encoder.ts && \
