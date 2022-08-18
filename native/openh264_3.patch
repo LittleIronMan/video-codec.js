@@ -1,7 +1,16 @@
 diff --git a/Makefile b/Makefile
-index dceec3bd..3e911002 100644
+index dceec3bd..6654628b 100644
 --- a/Makefile
 +++ b/Makefile
+@@ -8,7 +8,7 @@ vpath %.rc $(SRC_PATH)
+ vpath %.pc.in $(SRC_PATH)
+ 
+ OS=$(shell uname | tr A-Z a-z | tr -d \\-0-9. | sed -E 's/^(net|open|free)bsd/bsd/')
+-ARCH=$(shell uname -m)
++ARCH=x86
+ LIBPREFIX=lib
+ LIBSUFFIX=a
+ CCAS=$(CC)
 @@ -34,7 +34,7 @@ GTEST_VER=release-1.8.1
  CCASFLAGS=$(CFLAGS)
  STATIC_LDFLAGS=-lstdc++
@@ -25,12 +34,12 @@ index dceec3bd..3e911002 100644
  
  H264DEC_INCLUDES += $(DECODER_INCLUDES) $(CONSOLE_COMMON_INCLUDES) -I$(SRC_PATH)codec/console/dec/inc
 -H264DEC_LDFLAGS = $(LINK_LOCAL_DIR) $(call LINK_LIB,decoder) $(call LINK_LIB,common) $(call LINK_LIB,console_common)
-+H264DEC_LDFLAGS = $(LINK_LOCAL_DIR) $(call LINK_LIB,decoder) $(call LINK_LIB,common) $(call LINK_LIB,console_common) -Wl,-mwasm64
++H264DEC_LDFLAGS = $(LINK_LOCAL_DIR) $(call LINK_LIB,decoder) $(call LINK_LIB,common) $(call LINK_LIB,console_common) -pthread
  H264DEC_DEPS = $(LIBPREFIX)decoder.$(LIBSUFFIX) $(LIBPREFIX)common.$(LIBSUFFIX) $(LIBPREFIX)console_common.$(LIBSUFFIX)
  
  H264ENC_INCLUDES += $(ENCODER_INCLUDES) $(CONSOLE_COMMON_INCLUDES) -I$(SRC_PATH)codec/console/enc/inc
 -H264ENC_LDFLAGS = $(LINK_LOCAL_DIR) $(call LINK_LIB,encoder) $(call LINK_LIB,processing) $(call LINK_LIB,common) $(call LINK_LIB,console_common)
-+H264ENC_LDFLAGS = $(LINK_LOCAL_DIR) $(call LINK_LIB,encoder) $(call LINK_LIB,processing) $(call LINK_LIB,common) $(call LINK_LIB,console_common) -Wl,-mwasm64
++H264ENC_LDFLAGS = $(LINK_LOCAL_DIR) $(call LINK_LIB,encoder) $(call LINK_LIB,processing) $(call LINK_LIB,common) $(call LINK_LIB,console_common) -pthread
  H264ENC_DEPS = $(LIBPREFIX)encoder.$(LIBSUFFIX) $(LIBPREFIX)processing.$(LIBSUFFIX) $(LIBPREFIX)common.$(LIBSUFFIX) $(LIBPREFIX)console_common.$(LIBSUFFIX)
  
  CODEC_UNITTEST_LDFLAGS = $(LINK_LOCAL_DIR) $(call LINK_LIB,gtest) $(call LINK_LIB,decoder) $(call LINK_LIB,encoder) $(call LINK_LIB,processing) $(call LINK_LIB,common) $(CODEC_UNITTEST_LDFLAGS_SUFFIX)
@@ -188,27 +197,3 @@ index dceec3bd..3e911002 100644
  
  $(OBJS): | $(OBJDIRS)
 +#	@echo "--- [Makefile] $@"
-diff --git a/build/platform-linux.mk b/build/platform-linux.mk
-index e46ae689..4a0932ff 100644
---- a/build/platform-linux.mk
-+++ b/build/platform-linux.mk
-@@ -2,7 +2,7 @@ include $(SRC_PATH)build/arch.mk
- SHAREDLIBSUFFIX = so
- SHAREDLIBSUFFIXFULLVER=$(SHAREDLIBSUFFIX).$(FULL_VERSION)
- SHAREDLIBSUFFIXMAJORVER=$(SHAREDLIBSUFFIX).$(SHAREDLIB_MAJORVERSION)
--SHLDFLAGS = -Wl,-soname,$(LIBPREFIX)$(PROJECT_NAME).$(SHAREDLIBSUFFIXMAJORVER)
-+SHLDFLAGS = -Wl,-soname,$(LIBPREFIX)$(PROJECT_NAME).$(SHAREDLIBSUFFIXMAJORVER) -Wl,-mwasm64
- CFLAGS += -Wall -fno-strict-aliasing -fPIC -MMD -MP
- ifeq ($(USE_STACK_PROTECTOR), Yes)
- CFLAGS += -fstack-protector-all
-diff --git a/build/x86-common.mk b/build/x86-common.mk
-index c2cf96b7..728b817d 100644
---- a/build/x86-common.mk
-+++ b/build/x86-common.mk
-@@ -1,5 +1,5 @@
- CFLAGS_M32=-m32
--CFLAGS_M64=-m64
-+CFLAGS_M64=-m64 -sMEMORY64
- ASM_INCLUDES = -I$(SRC_PATH)codec/common/x86/
- ifneq ($(ENABLE64BIT),)
- ifeq ($(ENABLE64BIT), Yes)
