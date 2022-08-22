@@ -11,10 +11,10 @@ class CORSRequestHandler(SimpleHTTPRequestHandler):
         self.send_header('Cross-Origin-Embedder-Policy', 'require-corp')
         return super(CORSRequestHandler, self).end_headers()
 
-    def send_my_headers(self):
-        self.send_header("Cache-Control", "no-cache, no-store, must-revalidate")
-        self.send_header("Pragma", "no-cache")
-        self.send_header("Expires", "0")
+    # def send_my_headers(self):
+    #     self.send_header("Cache-Control", "no-cache, no-store, must-revalidate")
+    #     self.send_header("Pragma", "no-cache")
+    #     self.send_header("Expires", "0")
 
-httpd = HTTPServer(('localhost', 8003), CORSRequestHandler)
-httpd.serve_forever()
+with HTTPServer(('localhost', 8003), CORSRequestHandler) as httpd:
+    httpd.serve_forever()
