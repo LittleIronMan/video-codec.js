@@ -77,7 +77,7 @@ class VPXEncoder {
         this.worker.postMessage(<Packet&IResult>{
             status: 0,
             data: null,
-            frame_type: FrameType.Unknown
+            frame_type: H264FrameType.Unknown
         });
     }
 
@@ -94,7 +94,7 @@ class VPXEncoder {
         }
         Module.setValue(this.iter, 0, 'i32');
         var data = null;
-        var ftype = FrameType.Unknown;
+        var ftype = H264FrameType.Unknown;
         while ((ret = _vpx_codec_get_cx_data(this.ctx, this.iter)) != 0) {
             if (data) {
                 // インタフェース的に未対応...
@@ -107,7 +107,7 @@ class VPXEncoder {
                 data = new ArrayBuffer(pkt.data.byteLength);
                 new Uint8Array(data).set(pkt.data);
                 if ((pkt.flags & 1) == 1) {
-                    ftype = FrameType.Key;
+                    ftype = H264FrameType.Key;
                 }
             }
         }

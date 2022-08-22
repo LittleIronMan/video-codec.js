@@ -1,0 +1,12 @@
+{
+  "name": "video-codec.js",
+  "version": "0.0.1",
+  "description": "",
+  "scripts": {
+    "test_only_openh264_decoder": "tsc --lib DOM,WebWorker,ES6 --skipLibCheck --target ES6 --out test_only_openh264_decoder.js test_only_openh264_decoder.ts",
+		"serve": "python testServer.py"
+  },
+  "dependencies": {
+    "typescript": "^4.7.4"
+  }
+}

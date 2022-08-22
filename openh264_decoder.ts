@@ -37,6 +37,7 @@ class OpenH264Decoder {
         this.out_ptr = Module._malloc(4 * 3);
         this.out = Module.HEAP32.subarray(this.out_ptr / 4,
                                           this.out_ptr / 4 + 3);
+        // На первый message просто отвечаем `{status: 0}`
         this.worker.onmessage = (e: MessageEvent) => {
             this._setup();
         };

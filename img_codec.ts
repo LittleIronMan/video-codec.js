@@ -1,5 +1,4 @@
 /// <reference path="api.ts" />
-/// <reference path="typings/Canvas.d.ts" />
 
 class MotionImageEncoder implements IEncoder {
     static MIME = ['image/png', 'image/jpeg', 'image/webp'];
@@ -35,7 +34,7 @@ class MotionImageEncoder implements IEncoder {
             header[2] = cfg.height;
             resolve({
                 data: header.buffer,
-                frame_type: FrameType.Unknown
+                frame_type: H264FrameType.Unknown
             });
         });
     }
@@ -45,12 +44,12 @@ class MotionImageEncoder implements IEncoder {
             this._convert(frame, this._data.width, this._data.height, this._data.data);
             this._context.putImageData(this._data, 0, 0);
             if (this._canvas.toBlob) {
-                this._canvas.toBlob((blob: Blob) => {
+                this._canvas.toBlob((blob) => {
                     var reader = new FileReader();
                     reader.onload = () => {
                         resolve({
                             data: reader.result,
-                            frame_type: FrameType.Key
+                            frame_type: H264FrameType.Key
                         });
                     };
                     reader.readAsArrayBuffer(blob);
@@ -66,7 +65,7 @@ class MotionImageEncoder implements IEncoder {
                 reader.onload = () => {
                     resolve({
                         data: reader.result,
-                        frame_type: FrameType.Key
+                        frame_type: H264FrameType.Key
                     });
                 };
                 reader.readAsArrayBuffer(blob);
@@ -74,7 +73,7 @@ class MotionImageEncoder implements IEncoder {
         });
     }
 
-    _convert(frame: VideoFrame, width: number, height: number, rgba: Array<number>) {
+    private _convert(frame: VideoFrame, width: number, height: number, rgba: Uint8ClampedArray) {
         for (var y = 0; y < height; y += 2) {
             var p0 = y * width;
             var p1 = p0 + width;
@@ -126,7 +125,7 @@ class MotionImageDecoder implements IDecoder {
     }
 
     setup(cfg: any, packet: Packet): Promise<any> {
-        return new Promise<any>((resolve, reject) => {
+        return new Promise<void>((resolve, reject) => {
             if (packet && packet.data && packet.data.byteLength == 12) {
                 var header = new Uint32Array(packet.data);
                 this._mime = MotionImageEncoder.MIME[header[0]];
@@ -170,7 +169,7 @@ class MotionImageDecoder implements IDecoder {
         });
     }
 
-    _convert(img: ImageData) {
+    private _convert(img: ImageData) {
         var rgba = img.data;
         for (var y = 0, j = 0; y < img.height; y += 2) {
             var p = y * img.width;

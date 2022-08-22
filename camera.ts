@@ -1,5 +1,4 @@
 /// <reference path="api.ts" />
-/// <reference path="typings/MediaStream.d.ts" />
 
 class Camera implements IReader {
     _video: HTMLVideoElement = null;
@@ -20,7 +19,7 @@ class Camera implements IReader {
     open(args: any): Promise<VideoInfo> {
         return new Promise<VideoInfo>((resolve, reject) => {
             var video_constraints: any = true;
-            var callback = (strm) => {
+            var callback = (strm: MediaStream) => {
                 this._fps = args['fps'] || 5;
                 this._sec_per_frame = 1 / this._fps;
                 this._first_timestamp = this._prev_frame_index = -1;
@@ -57,25 +56,6 @@ class Camera implements IReader {
                     audio: false,
                     video: video_constraints
                 }).then(callback, reject);
-            } else {
-                navigator.getUserMedia = (navigator.getUserMedia ||
-                                          navigator.webkitGetUserMedia ||
-                                          navigator.mozGetUserMedia ||
-                                          navigator.msGetUserMedia);
-                if (args['width'] && args['height']) {
-                    video_constraints = {
-                        mandatory: {
-                            minWidth: args['width'],
-                            minHeight: args['height'],
-                            maxWidth: args['width'],
-                            maxHeight: args['height']
-                        }
-                    };
-                }
-                navigator.getUserMedia({
-                    audio: false,
-                    video: video_constraints,
-                }, callback, reject);
             }
         });
     }

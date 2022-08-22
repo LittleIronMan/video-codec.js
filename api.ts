@@ -1,5 +1,3 @@
-/// <reference path="typings/es6-promise.d.ts" />
-
 interface VideoInfo {
     width: number;
     height: number;
@@ -48,7 +46,7 @@ interface IRenderer {
 
 interface Packet {
     data: ArrayBuffer;
-    frame_type: FrameType;
+    frame_type: H264FrameType;
 }
 
 interface IResult {

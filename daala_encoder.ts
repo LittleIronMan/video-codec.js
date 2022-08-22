@@ -103,7 +103,7 @@ class DaalaEncoder {
         this.worker.postMessage(<Packet&IResult>{
             status: 0,
             data: data,
-            frame_type: FrameType.Unknown
+            frame_type: H264FrameType.Unknown
         }, [data]);
     }
 
@@ -131,14 +131,14 @@ class DaalaEncoder {
             this.worker.postMessage(<Packet&IResult>{
                 status: 0,
                 data: pkt,
-                frame_type: FrameType.Unknown
+                frame_type: H264FrameType.Unknown
             }, [pkt]);
         } else {
             // このルートを通る可能性ってある？
             this.worker.postMessage(<Packet&IResult>{
                 status: 0,
                 data: null,
-                frame_type: FrameType.Unknown
+                frame_type: H264FrameType.Unknown
             });
         }
     }

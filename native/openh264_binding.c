@@ -14,7 +14,7 @@ SEncParamExt *CreateEncParamExt(ISVCEncoder *encoder, int width, int height, flo
     param->sSpatialLayers[0].iVideoHeight = param->iPicHeight;
     param->sSpatialLayers[0].fFrameRate = param->fMaxFrameRate;
     param->sSpatialLayers[0].iSpatialBitrate = param->iTargetBitrate;
-    param->sSpatialLayers[0].uiProfileIdc = PRO_BASELINE;
+    param->sSpatialLayers[0].uiProfileIdc = PRO_BASELINE; // PRO_HIGH
     return param;
 }
 
