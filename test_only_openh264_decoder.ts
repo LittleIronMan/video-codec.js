@@ -14,7 +14,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
     };
 
-    decoderWorker.postMessage({});
+    setTimeout(() => {
+      decoderWorker.postMessage({});
+    }, 1000);
   });
 
   console.log(`--- Worker started successfully`);
@@ -35,8 +37,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   const dst_renderer = new Renderer(<HTMLCanvasElement>document.getElementById('decoded'));
   dst_renderer.init({
     // TODO расхардкодить
-    width: 320,
-    height: 240,
+    width: 1920,
+    height: 1080,
     // не используются при декодировании
     fps_num: 30,
     fps_den: 1,
@@ -53,8 +55,12 @@ document.addEventListener("DOMContentLoaded", async () => {
       return;
     }
 
+    console.log("msg");
+
     decode({data} as Packet).then(
       (frame) => {
+        console.log("success");
+
         if (frame.data) {
           dst_renderer.draw(frame);
         }
