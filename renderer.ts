@@ -31,6 +31,7 @@ class Renderer implements IRenderer {
         var start = Date.now();
         var img = this._img;
         var rgba = img.data;
+        // console.log(`start convert yuv`);
         for (var y = 0; y < img.height; y += 2) {
             var p0 = y * img.width;
             var p1 = p0 + img.width;
@@ -60,6 +61,8 @@ class Renderer implements IRenderer {
                 rgba[p3 + 6] = y3 + t2;
             }
         }
+        // console.log(`end convert yuv`);
         this._context.putImageData(img, 0, 0);
+        // console.log(`canvas context updated`);
     }
 }

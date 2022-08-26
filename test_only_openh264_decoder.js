@@ -42,6 +42,7 @@ class Renderer {
         var start = Date.now();
         var img = this._img;
         var rgba = img.data;
+        // console.log(`start convert yuv`);
         for (var y = 0; y < img.height; y += 2) {
             var p0 = y * img.width;
             var p1 = p0 + img.width;
@@ -71,7 +72,9 @@ class Renderer {
                 rgba[p3 + 6] = y3 + t2;
             }
         }
+        // console.log(`end convert yuv`);
         this._context.putImageData(img, 0, 0);
+        // console.log(`canvas context updated`);
     }
 }
 /// <reference path="renderer.ts" />
@@ -117,14 +120,17 @@ document.addEventListener("DOMContentLoaded", () => __awaiter(this, void 0, void
     const videoUrl = "ws://localhost:8080/ws/video";
     const ws = new WebSocket(videoUrl);
     ws.binaryType = "arraybuffer";
-    ws.addEventListener("message", ({ data }) => {
+    ws.addEventListener("message", function onMessage({ data }) {
         // https://github.com/samirkumardas/jmuxer/issues/40
         if (document.visibilityState == "hidden") {
             console.log("---- Skip video websocket sample, because tab is hidden");
             return;
         }
-        console.log("msg");
-        decode({ data }).then((frame) => {
+        if (data.byteLength == 6) {
+            return;
+        }
+        console.log(`ws msg, size == ${data.byteLength}`);
+        decode({ data }).then(function afterDecode(frame) {
             console.log("success");
             if (frame.data) {
                 dst_renderer.draw(frame);

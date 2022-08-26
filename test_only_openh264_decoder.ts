@@ -48,17 +48,21 @@ document.addEventListener("DOMContentLoaded", async () => {
   const ws = new WebSocket(videoUrl);
   ws.binaryType = "arraybuffer";
 
-  ws.addEventListener("message", ({ data }) => {
+  ws.addEventListener("message", function onMessage({ data }: {data: ArrayBuffer}) {
     // https://github.com/samirkumardas/jmuxer/issues/40
     if (document.visibilityState == "hidden") {
       console.log("---- Skip video websocket sample, because tab is hidden");
       return;
     }
 
-    console.log("msg");
+    if (data.byteLength == 6) {
+      return;
+    }
+
+    console.log(`ws msg, size == ${data.byteLength}`);
 
     decode({data} as Packet).then(
-      (frame) => {
+      function afterDecode(frame) {
         console.log("success");
 
         if (frame.data) {
